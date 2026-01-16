@@ -35,9 +35,13 @@ def test_price_returns_value(monkeypatch):
     os.environ["SKIP_IB_CONNECT_ON_STARTUP"] = "1"
     os.environ["API_TOKEN"] = "testtoken"
 
+    async def fake_connect():
+        return None
+
     async def fake_price(_symbol: str):
         return 123.45
 
+    monkeypatch.setattr(ib, "connect_with_retry", fake_connect)
     monkeypatch.setattr(ib, "get_last_price", fake_price)
     client = TestClient(app)
 
