@@ -168,6 +168,85 @@ NO-GO if:
 - IP allowlist: restrict Nginx `location /` to your IP only.
 - Simple health ping: cron `curl -fsS http://127.0.0.1:8000/health || <alert-command>`
 
+## iOS App Setup (Xcode)
+
+Project location:
+
+- Repo path: `ios/IBKRWatchApp/`
+- Source files: `ios/IBKRWatchApp/IBKRWatchApp/`
+
+Xcode new project steps (click path):
+
+1) Xcode -> File -> New -> Project...
+2) iOS -> App -> Next
+3) Product Name: `IBKRWatchApp`
+4) Team: (select your team)
+5) Organization Identifier: `com.example`
+6) Bundle Identifier: `com.example.IBKRWatchApp`
+7) Interface: SwiftUI
+8) Language: Swift
+9) Minimum Deployment: iOS 17.0
+10) Choose folder: `ios/IBKRWatchApp/`
+11) Create
+
+Add file groups in Xcode (left sidebar):
+
+- App
+- Networking
+- Models
+- Services
+- ViewModels
+- Views
+
+Add files (Copy items if needed = ON, Target Membership = IBKRWatchApp):
+
+- `IBKRWatchApp/App/IBKRWatchApp.swift` -> group App
+- `IBKRWatchApp/App/AppState.swift` -> group App
+- `IBKRWatchApp/Networking/APIClient.swift` -> group Networking
+- `IBKRWatchApp/Models/Models.swift` -> group Models
+- `IBKRWatchApp/Services/KeychainService.swift` -> group Services
+- `IBKRWatchApp/ViewModels/StatusViewModel.swift` -> group ViewModels
+- `IBKRWatchApp/ViewModels/PricesViewModel.swift` -> group ViewModels
+- `IBKRWatchApp/Views/StatusView.swift` -> group Views
+- `IBKRWatchApp/Views/PricesView.swift` -> group Views
+- `IBKRWatchApp/Views/SettingsView.swift` -> group Views
+- `IBKRWatchApp/Views/TokenPromptView.swift` -> group Views
+
+App config:
+
+- Base URL default: `http://127.0.0.1:8000` (Simulator)
+- Token stored in Keychain on first setup
+
+ATS for HTTP vs HTTPS:
+
+If you use HTTP (non‑TLS) for a VPS IP, add a targeted exception in Info.plist.
+Do NOT enable global arbitrary loads.
+
+Plist snippet:
+
+```
+<key>NSAppTransportSecurity</key>
+<dict>
+  <key>NSExceptionDomains</key>
+  <dict>
+    <key>127.0.0.1</key>
+    <dict>
+      <key>NSExceptionAllowsInsecureHTTPLoads</key>
+      <true/>
+    </dict>
+  </dict>
+</dict>
+```
+
+Build & Run (local smoke checks):
+
+1) Run app in Simulator
+2) First launch -> token prompt appears
+3) Status tab shows `/health` (no token required)
+4) Prices tab:
+   - without token -> 401 error shown
+   - with token -> `/price/AAPL` returns 200 and shows price
+
 ## Security
 
 - API port is bound to `127.0.0.1:8000` and not reachable externally.
