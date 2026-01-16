@@ -23,7 +23,9 @@ final class StatusViewModel: ObservableObject {
         let client = APIClient(baseURL: baseURL, tokenProvider: { self.appState.apiToken })
 
         do {
-            health = try await client.fetchHealth()
+            let response = try await client.fetchHealth()
+            health = response
+            appState.updateHealth(response)
         } catch let error as APIError {
             errorMessage = error.localizedDescription
         } catch {

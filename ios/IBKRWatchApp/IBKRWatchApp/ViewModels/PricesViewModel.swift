@@ -1,14 +1,8 @@
 import Foundation
 
-struct PriceRow: Identifiable {
-    let id = UUID()
-    let symbol: String
-    let price: Double?
-}
-
 @MainActor
 final class PricesViewModel: ObservableObject {
-    @Published var rows: [PriceRow] = []
+    @Published var rows: [PriceSnapshot] = []
     @Published var lastUpdated: Date?
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -19,7 +13,7 @@ final class PricesViewModel: ObservableObject {
 
     init(appState: AppState) {
         self.appState = appState
-        rows = symbols.map { PriceRow(symbol: $0, price: nil) }
+        rows = symbols.map { PriceSnapshot(symbol: $0, price: nil) }
     }
 
     func startAutoRefresh() {
@@ -47,13 +41,14 @@ final class PricesViewModel: ObservableObject {
         let client = APIClient(baseURL: baseURL, tokenProvider: { self.appState.apiToken })
 
         do {
-            var updatedRows: [PriceRow] = []
+            var updatedRows: [PriceSnapshot] = []
             for symbol in symbols {
                 let response = try await client.fetchPrice(symbol: symbol)
-                updatedRows.append(PriceRow(symbol: response.symbol, price: response.price))
+                updatedRows.append(PriceSnapshot(symbol: response.symbol, price: response.price))
             }
             rows = updatedRows
             lastUpdated = Date()
+            appState.updatePrices(updatedRows)
         } catch let error as APIError {
             errorMessage = error.localizedDescription
         } catch {

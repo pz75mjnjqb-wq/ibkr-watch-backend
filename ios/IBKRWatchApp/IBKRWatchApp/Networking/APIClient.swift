@@ -2,6 +2,7 @@ import Foundation
 
 enum APIError: LocalizedError, Equatable {
     case invalidURL
+    case backendUnreachable
     case networkError(String)
     case httpError(Int)
     case unauthorized
@@ -11,6 +12,8 @@ enum APIError: LocalizedError, Equatable {
         switch self {
         case .invalidURL:
             return "Invalid URL"
+        case .backendUnreachable:
+            return "Backend unreachable"
         case .networkError(let message):
             return message
         case .httpError(let code):
@@ -71,6 +74,11 @@ struct APIClient {
             }
         } catch let error as APIError {
             throw error
+        } catch let error as URLError {
+            if error.code == .cannotConnectToHost || error.code == .notConnectedToInternet {
+                throw APIError.backendUnreachable
+            }
+            throw APIError.networkError(error.localizedDescription)
         } catch {
             throw APIError.networkError(error.localizedDescription)
         }

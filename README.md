@@ -247,6 +247,19 @@ Build & Run (local smoke checks):
    - without token -> 401 error shown
    - with token -> `/price/AAPL` returns 200 and shows price
 
+## Watch Setup (Companion)
+
+Data Flow:
+
+- iPhone fetches `/health` and `/price/{symbol}`.
+- iPhone pushes cached payload to Watch via `WCSession` (no direct Watch networking).
+- Watch displays cached data + last update time.
+
+Battery Notes:
+
+- Phone sends updates on refresh (default 30s).
+- Watch only renders cached data.
+
 ## Security
 
 - API port is bound to `127.0.0.1:8000` and not reachable externally.

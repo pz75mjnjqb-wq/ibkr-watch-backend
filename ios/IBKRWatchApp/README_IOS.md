@@ -26,3 +26,4 @@ Notes:
 
 - Build only (no Simulator UI).
 - If you want to run on a device, set a valid team in Xcode.
+ - Watch target is included; build uses iOS simulator only.

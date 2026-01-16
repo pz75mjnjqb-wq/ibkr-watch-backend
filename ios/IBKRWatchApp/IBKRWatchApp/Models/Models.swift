@@ -18,3 +18,9 @@ struct PriceResponse: Codable {
     let symbol: String
     let price: Double?
 }
+
+struct PriceSnapshot: Identifiable {
+    let id = UUID()
+    let symbol: String
+    let price: Double?
+}
