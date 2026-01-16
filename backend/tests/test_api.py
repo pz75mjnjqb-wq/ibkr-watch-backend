@@ -7,6 +7,8 @@ import app.ib as ib
 
 def test_health_returns_connection_status(monkeypatch):
     monkeypatch.setattr(ib, "is_connected", lambda: True)
+    monkeypatch.setattr(ib, "last_connect_attempt", lambda: "2024-01-01T00:00:00Z")
+    monkeypatch.setattr(ib, "last_error", lambda: None)
     client = TestClient(app)
 
     response = client.get("/health")
@@ -15,6 +17,8 @@ def test_health_returns_connection_status(monkeypatch):
     payload = response.json()
     assert payload["status"] == "ok"
     assert payload["ib_connected"] is True
+    assert payload["ib_last_connect_attempt"] == "2024-01-01T00:00:00Z"
+    assert payload["ib_last_error"] is None
 
 
 def test_price_requires_token():

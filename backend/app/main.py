@@ -1,7 +1,13 @@
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.responses import JSONResponse
 from .auth import require_api_token
-from .ib import connect_with_retry, get_last_price, is_connected
+from .ib import (
+    connect_with_retry,
+    get_last_price,
+    is_connected,
+    last_connect_attempt,
+    last_error,
+)
 
 app = FastAPI(title="IBKR Watch Backend", version="1.0.0")
 
@@ -21,6 +27,8 @@ async def health() -> JSONResponse:
         {
             "status": "ok",
             "ib_connected": is_connected(),
+            "ib_last_connect_attempt": last_connect_attempt(),
+            "ib_last_error": last_error(),
         }
     )
 
@@ -34,11 +42,5 @@ async def price(symbol: str) -> JSONResponse:
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(exc),
         ) from exc
-
-    if last_price is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Price not available",
-        )
 
     return JSONResponse({"symbol": symbol.upper(), "price": last_price})

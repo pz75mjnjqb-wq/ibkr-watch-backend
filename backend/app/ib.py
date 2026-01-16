@@ -1,5 +1,6 @@
 import asyncio
 import os
+from datetime import datetime, timezone
 from ib_insync import IB, Stock
 
 IBKR_HOST = os.getenv("IBKR_HOST", "ibgateway")
@@ -8,6 +9,8 @@ IBKR_CLIENT_ID = int(os.getenv("IBKR_CLIENT_ID", "1001"))
 
 _ib = IB()
 _connect_lock = asyncio.Lock()
+_last_connect_attempt: str | None = None
+_last_error: str | None = None
 
 
 async def connect_with_retry(max_attempts: int = 5) -> None:
@@ -19,6 +22,9 @@ async def connect_with_retry(max_attempts: int = 5) -> None:
             return
 
         for attempt in range(1, max_attempts + 1):
+            global _last_connect_attempt
+            global _last_error
+            _last_connect_attempt = datetime.now(timezone.utc).isoformat()
             try:
                 await _ib.connectAsync(
                     host=IBKR_HOST,
@@ -27,15 +33,25 @@ async def connect_with_retry(max_attempts: int = 5) -> None:
                     timeout=5,
                 )
                 if _ib.isConnected():
+                    _last_error = None
                     return
-            except Exception:
+            except Exception as exc:
+                _last_error = str(exc)
                 await asyncio.sleep(min(2**attempt, 10))
 
-    raise RuntimeError("Unable to connect to IBKR gateway")
+    raise RuntimeError(_last_error or "Unable to connect to IBKR gateway")
 
 
 def is_connected() -> bool:
     return _ib.isConnected()
+
+
+def last_connect_attempt() -> str | None:
+    return _last_connect_attempt
+
+
+def last_error() -> str | None:
+    return _last_error
 
 
 async def get_last_price(symbol: str) -> float | None:

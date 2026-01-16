@@ -36,6 +36,99 @@ docker compose up -d --build
 docker compose --profile nginx up -d --build
 ```
 
+## VPS Deploy (Ubuntu 22.04)
+
+Run the bootstrap once on a fresh VPS:
+
+```
+sudo ./scripts/vps_bootstrap.sh
+```
+
+Deploy the app:
+
+```
+sudo ./scripts/deploy.sh
+```
+
+Smoke test (local only):
+
+```
+sudo ./scripts/smoke.sh
+```
+
+## Security
+
+- API port is bound to `127.0.0.1:8000` and not reachable externally.
+- Public ports: 22, 80, 443 only.
+- API Token (`X-API-Token`) is required for `/price`.
+- Disable SSH password auth; use SSH keys.
+- Fail2ban is enabled by `scripts/vps_bootstrap.sh`.
+- Nginx applies rate limiting (10 req/s, burst 20) and basic security headers.
+
+## TLS (Optional)
+
+Recommended: install certbot on the host and terminate TLS in Nginx.
+
+```
+sudo apt-get update
+sudo apt-get install -y certbot python3-certbot-nginx
+```
+
+Option A: Nginx HTTP-01 (recommended)
+
+```
+sudo certbot --nginx -d your-domain.example
+```
+
+Ensure Nginx is running with the profile:
+
+```
+docker compose --profile nginx up -d --build
+```
+
+Verify:
+
+- `https://your-domain.example/health` returns 200
+- `http://your-domain.example` redirects to HTTPS
+
+Option B: nginx-proxy-manager (not recommended unless required)
+
+- Run NPM separately and proxy to this service on port 80.
+
+## Observability / Logs
+
+- API logs: `docker logs -f ibkr-api`
+- Gateway logs: `docker logs -f ibgateway`
+- Nginx logs: `docker logs -f ibkr-nginx`
+
+## Troubleshooting
+
+- Gateway login fails: verify `TWS_USERID`, `TWS_PASSWORD`, and `TRADING_MODE`.
+- 2FA / session expired: log into IBKR portal and approve the session.
+- No market data: verify IBKR market data subscriptions for the symbol.
+- `/price` returns `null`: market closed or no market data permissions.
+
+## Runbook
+
+Restart all services:
+
+```
+docker compose restart
+```
+
+Check status:
+
+```
+docker ps
+docker compose logs --tail 50 api
+```
+
+Rotate API token:
+
+```
+sudo ./scripts/rotate_token.sh
+```
+
 ## API
 
 ### Health
@@ -52,6 +145,10 @@ Response:
   "ib_connected": true
 }
 ```
+
+Notes:
+
+- `/health` is intentionally unauthenticated for simple liveness checks.
 
 ### Price
 
