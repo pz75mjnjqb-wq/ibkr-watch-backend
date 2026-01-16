@@ -7,9 +7,9 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      - TRADING_MODE=${TRADING_MODE}
-      - TWS_USERID=${TWS_USERID}
-      - TWS_PASSWORD=${TWS_PASSWORD}
+      - TRADING_MODE=${IBKR_MODE}
+      - TWS_USERID=${IBKR_USER}
+      - TWS_PASSWORD=${IBKR_PASS}
       - TZ=${TZ}
     networks:
       - backend

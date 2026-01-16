@@ -20,15 +20,14 @@ Release: `v0.1.0`
 
 ## Setup
 
-1) Copy `.env.example` to `.env` and fill in values:
-
 ```
+cd <repo-root>
 cp .env.example .env
-```
-
-2) Start the stack:
-
-```
+# .env anpassen:
+# IBKR_USER=...
+# IBKR_PASS=...
+# IBKR_MODE=paper   # empfohlen
+# API_TOKEN=<starkes_token>
 docker compose up -d --build
 ```
 
@@ -309,7 +308,7 @@ Option B: nginx-proxy-manager (not recommended unless required)
 
 ## Troubleshooting
 
-- Gateway login fails: verify `TWS_USERID`, `TWS_PASSWORD`, and `TRADING_MODE`.
+- Gateway login fails: verify `IBKR_USER`, `IBKR_PASS`, and `IBKR_MODE`.
 - 2FA / session expired: log into IBKR portal and approve the session.
 - No market data: verify IBKR market data subscriptions for the symbol.
 - `/price` returns `null`: market closed or no market data permissions.
@@ -381,7 +380,7 @@ Response:
 
 See `.env.example`. Required:
 
-- `TWS_USERID`, `TWS_PASSWORD`, `TRADING_MODE` (IB Gateway)
+- `IBKR_USER`, `IBKR_PASS`, `IBKR_MODE` (IB Gateway)
 - `API_TOKEN` (backend auth)
 - `IBKR_PORT`, `IBKR_CLIENT_ID`
 
@@ -406,7 +405,7 @@ Adjust allowed ports as needed.
 ## Notes
 
 - The backend auto-reconnects to IB Gateway if the connection drops.
-- Paper/Live mode is controlled via `TRADING_MODE`.
+- Paper/Live mode is controlled via `IBKR_MODE`.
 
 ## Production Checklist
 
