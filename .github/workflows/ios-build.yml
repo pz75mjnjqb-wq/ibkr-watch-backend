@@ -1,0 +1,21 @@
+name: ios-build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ios-build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate project
+        working-directory: ios/IBKRWatchApp
+        run: ./scripts/generate.sh
+      - name: Build (Simulator)
+        working-directory: ios/IBKRWatchApp
+        run: ./scripts/build_sim.sh
