@@ -6,6 +6,7 @@ import app.ib as ib
 
 
 def test_health_returns_connection_status(monkeypatch):
+    os.environ["SKIP_IB_CONNECT_ON_STARTUP"] = "1"
     monkeypatch.setattr(ib, "is_connected", lambda: True)
     monkeypatch.setattr(ib, "last_connect_attempt", lambda: "2024-01-01T00:00:00Z")
     monkeypatch.setattr(ib, "last_error", lambda: None)
@@ -22,6 +23,7 @@ def test_health_returns_connection_status(monkeypatch):
 
 
 def test_price_requires_token():
+    os.environ["SKIP_IB_CONNECT_ON_STARTUP"] = "1"
     client = TestClient(app)
 
     response = client.get("/price/AAPL")
@@ -30,7 +32,8 @@ def test_price_requires_token():
 
 
 def test_price_returns_value(monkeypatch):
-    os.environ["API_TOKEN"] = "test-token"
+    os.environ["SKIP_IB_CONNECT_ON_STARTUP"] = "1"
+    os.environ["API_TOKEN"] = "testtoken"
 
     async def fake_price(_symbol: str):
         return 123.45
@@ -38,7 +41,7 @@ def test_price_returns_value(monkeypatch):
     monkeypatch.setattr(ib, "get_last_price", fake_price)
     client = TestClient(app)
 
-    response = client.get("/price/AAPL", headers={"X-API-Token": "test-token"})
+    response = client.get("/price/AAPL", headers={"X-API-Token": "testtoken"})
 
     assert response.status_code == 200
     payload = response.json()

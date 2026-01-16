@@ -1,3 +1,4 @@
+import os
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.responses import JSONResponse
 from .auth import require_api_token
@@ -14,6 +15,8 @@ app = FastAPI(title="IBKR Watch Backend", version="1.0.0")
 
 @app.on_event("startup")
 async def startup_event() -> None:
+    if os.getenv("SKIP_IB_CONNECT_ON_STARTUP") == "1":
+        return
     try:
         await connect_with_retry()
     except Exception:
