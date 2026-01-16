@@ -1,4 +1,5 @@
 # IBKR Watch Backend
+![tests](https://github.com/pz75mjnjqb-wq/ibkr-watch-backend/actions/workflows/tests.yml/badge.svg)
 
 Backend for an iPhone/Apple Watch app that talks to Interactive Brokers (IBKR) via IB Gateway.
 The mobile apps never connect to IBKR directly.
