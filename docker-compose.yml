@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  ibgateway:
+    image: ghcr.io/gnzsnz/ib-gateway:stable
+    container_name: ibgateway
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - TRADING_MODE=${TRADING_MODE}
+      - TWS_USERID=${TWS_USERID}
+      - TWS_PASSWORD=${TWS_PASSWORD}
+      - TZ=${TZ}
+    networks:
+      - backend
+
+  api:
+    build:
+      context: ./backend
+    container_name: ibkr-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - IBKR_HOST=ibgateway
+      - IBKR_PORT=${IBKR_PORT}
+      - IBKR_CLIENT_ID=${IBKR_CLIENT_ID}
+      - API_TOKEN=${API_TOKEN}
+    depends_on:
+      - ibgateway
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    container_name: ibkr-nginx
+    restart: unless-stopped
+    profiles: ["nginx"]
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites:/etc/nginx/conf.d:ro
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
