@@ -12,6 +12,7 @@ targets:
   IBKRWatchApp:
     type: application
     platform: iOS
+    deploymentTarget: "17.0"
     bundleId: com.example.IBKRWatchApp
     info:
       path: Info.plist
@@ -19,9 +20,13 @@ targets:
       - IBKRWatchApp
     frameworks:
       - WatchConnectivity.framework
+    dependencies:
+      - target: IBKRWatchAppWatchApp
+        embed: true
   IBKRWatchAppWatchApp:
-    type: watch2App
+    type: application.watchapp2
     platform: watchOS
+    deploymentTarget: "10.0"
     bundleId: com.example.IBKRWatchApp.watchkitapp
     info:
       path: WatchApp/Info.plist
@@ -30,14 +35,13 @@ targets:
     sources:
       - WatchApp
   IBKRWatchAppWatchExtension:
-    type: watch2Extension
+    type: watchkit2-extension
     platform: watchOS
+    deploymentTarget: "10.0"
     bundleId: com.example.IBKRWatchApp.watchkitapp.extension
     info:
       path: WatchExtension/Info.plist
     sources:
       - WatchExtension
-    dependencies:
-      - target: IBKRWatchApp
     frameworks:
       - WatchConnectivity.framework
