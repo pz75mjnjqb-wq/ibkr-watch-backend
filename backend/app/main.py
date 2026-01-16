@@ -1,21 +1,22 @@
 import os
+from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.responses import JSONResponse
 from .auth import require_api_token
 from . import ib
 
-app = FastAPI(title="IBKR Watch Backend", version="1.0.0")
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    if os.getenv("SKIP_IB_CONNECT_ON_STARTUP") != "1":
+        try:
+            await ib.connect_with_retry()
+        except Exception:
+            # Connection can be established later by endpoints.
+            pass
+    yield
 
 
-@app.on_event("startup")
-async def startup_event() -> None:
-    if os.getenv("SKIP_IB_CONNECT_ON_STARTUP") == "1":
-        return
-    try:
-        await ib.connect_with_retry()
-    except Exception:
-        # Connection can be established later by endpoints.
-        pass
+app = FastAPI(title="IBKR Watch Backend", version="1.0.0", lifespan=lifespan)
 
 
 @app.get("/health")

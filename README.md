@@ -4,6 +4,8 @@
 Backend for an iPhone/Apple Watch app that talks to Interactive Brokers (IBKR) via IB Gateway.
 The mobile apps never connect to IBKR directly.
 
+Release: `v0.1.0`
+
 ## Architecture
 
 - IB Gateway runs headless in Docker (internal network only).
@@ -405,3 +407,16 @@ Adjust allowed ports as needed.
 
 - The backend auto-reconnects to IB Gateway if the connection drops.
 - Paper/Live mode is controlled via `TRADING_MODE`.
+
+## Production Checklist
+
+- IBKR: Read-only API access enabled.
+- VPS: Only ports 22/80/443 open; 8000 bound to localhost.
+- Secrets: `API_TOKEN` rotated and not default.
+- Monitoring: `/health` checked regularly.
+
+## Roadmap (Optional)
+
+- Alerts for price thresholds or disconnects.
+- TLS + domain automation.
+- Watch refresh optimizations.
