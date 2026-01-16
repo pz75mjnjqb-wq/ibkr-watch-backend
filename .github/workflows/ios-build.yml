@@ -14,8 +14,18 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate project
-        working-directory: ios/IBKRWatchApp
-        run: ./scripts/generate.sh
+        run: |
+          cd ios/IBKRWatchApp
+          ./scripts/generate.sh 2>&1 | tee /tmp/xcodegen.log
       - name: Build (Simulator)
-        working-directory: ios/IBKRWatchApp
-        run: ./scripts/build_sim.sh
+        run: |
+          cd ios/IBKRWatchApp
+          ./scripts/build_sim.sh 2>&1 | tee /tmp/xcodebuild.log
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-logs
+          path: |
+            /tmp/xcodegen.log
+            /tmp/xcodebuild.log
