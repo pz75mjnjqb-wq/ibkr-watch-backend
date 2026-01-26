@@ -15,10 +15,12 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install dependencies
-        run: pip install -r backend/requirements.txt
+        run: |
+          pip install -r backend/requirements.txt
+          pip install pytest httpx
       - name: Run tests
         run: pytest -q backend/tests
         env:
           API_TOKEN: testtoken
           SKIP_IB_CONNECT_ON_STARTUP: "1"
-          PYTHONPATH: backend
+          PYTHONPATH: .

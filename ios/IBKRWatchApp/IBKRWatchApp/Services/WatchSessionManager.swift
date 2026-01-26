@@ -1,10 +1,12 @@
 import Foundation
+import Combine
 import WatchConnectivity
 
 @MainActor
-final class WatchSessionManager: NSObject, WCSessionDelegate {
+final class WatchSessionManager: NSObject, WCSessionDelegate, ObservableObject {
     static let shared = WatchSessionManager()
 
+    @Published var lastSentPayload: [String: Any]?
     private var lastPayloadHash: Int?
     private var lastSentAt: Date?
     private let formatter = ISO8601DateFormatter()
@@ -35,6 +37,7 @@ final class WatchSessionManager: NSObject, WCSessionDelegate {
         do {
             try WCSession.default.updateApplicationContext(payload)
             lastPayloadHash = payloadHash
+            lastSentPayload = payload
             lastSentAt = now
         } catch {
             // Best-effort only; no retry required.

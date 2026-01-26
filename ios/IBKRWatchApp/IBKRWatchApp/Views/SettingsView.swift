@@ -30,6 +30,12 @@ struct SettingsView: View {
                         .keyboardType(.numberPad)
                 }
 
+                Section("Developer") {
+                    NavigationLink("Open Watch Simulator") {
+                        WatchSimulationView()
+                    }
+                }
+
                 Button("Save") {
                     saveSettings()
                 }
@@ -53,8 +59,9 @@ struct SettingsView: View {
         if let value = Double(pollDraft), value >= 5 {
             appState.pollInterval = value
             appState.savePollInterval()
+            statusMessage = "Saved"
+        } else {
+            statusMessage = "Settings saved, but poll interval invalid (min 5s)"
         }
-
-        statusMessage = "Saved"
     }
 }

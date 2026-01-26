@@ -43,14 +43,14 @@ systemctl enable --now fail2ban
 
 # Status output
 
-echo "\nDocker:" 
+printf "\nDocker:\n"
 if command -v docker >/dev/null 2>&1; then
   docker --version
   docker compose version
 fi
 
-echo "\nUFW:" 
+printf "\nUFW:\n"
 ufw status verbose
 
-echo "\nFail2ban:" 
+printf "\nFail2ban:\n"
 systemctl status fail2ban --no-pager

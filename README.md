@@ -12,6 +12,28 @@ Release: `v0.1.0`
 - FastAPI backend connects to the gateway and exposes REST endpoints.
 - Optional Nginx reverse proxy on port 80 (HTTP only for now).
 
+## Local Development (Mock Mode)
+
+Run the backend locally with simulated data (no IBKR account required).
+
+### 1. Install Dependencies
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
+```
+
+### 2. Run Mock Server
+
+```bash
+chmod +x scripts/run_mock_backend.sh
+./scripts/run_mock_backend.sh
+```
+
+Server runs at `http://127.0.0.1:8000`.
+Use any string (e.g., `test`) as the API Token in the iOS app settings.
+
 ## Requirements
 
 - Ubuntu 22.04 LTS VPS
@@ -171,47 +193,22 @@ NO-GO if:
 
 ## iOS App Setup (Xcode)
 
-Project location:
+The iOS project is managed via `XcodeGen`.
 
-- Repo path: `ios/IBKRWatchApp/`
-- Source files: `ios/IBKRWatchApp/IBKRWatchApp/`
+### 1. Install XcodeGen
 
-Xcode new project steps (click path):
+```bash
+brew install xcodegen
+```
 
-1) Xcode -> File -> New -> Project...
-2) iOS -> App -> Next
-3) Product Name: `IBKRWatchApp`
-4) Team: (select your team)
-5) Organization Identifier: `com.example`
-6) Bundle Identifier: `com.example.IBKRWatchApp`
-7) Interface: SwiftUI
-8) Language: Swift
-9) Minimum Deployment: iOS 17.0
-10) Choose folder: `ios/IBKRWatchApp/`
-11) Create
+### 2. Generate Project
 
-Add file groups in Xcode (left sidebar):
+```bash
+cd ios/IBKRWatchApp
+./scripts/generate.sh
+```
 
-- App
-- Networking
-- Models
-- Services
-- ViewModels
-- Views
-
-Add files (Copy items if needed = ON, Target Membership = IBKRWatchApp):
-
-- `IBKRWatchApp/App/IBKRWatchApp.swift` -> group App
-- `IBKRWatchApp/App/AppState.swift` -> group App
-- `IBKRWatchApp/Networking/APIClient.swift` -> group Networking
-- `IBKRWatchApp/Models/Models.swift` -> group Models
-- `IBKRWatchApp/Services/KeychainService.swift` -> group Services
-- `IBKRWatchApp/ViewModels/StatusViewModel.swift` -> group ViewModels
-- `IBKRWatchApp/ViewModels/PricesViewModel.swift` -> group ViewModels
-- `IBKRWatchApp/Views/StatusView.swift` -> group Views
-- `IBKRWatchApp/Views/PricesView.swift` -> group Views
-- `IBKRWatchApp/Views/SettingsView.swift` -> group Views
-- `IBKRWatchApp/Views/TokenPromptView.swift` -> group Views
+Open `ios/IBKRWatchApp/IBKRWatchApp.xcodeproj`.
 
 App config:
 
@@ -413,9 +410,3 @@ Adjust allowed ports as needed.
 - VPS: Only ports 22/80/443 open; 8000 bound to localhost.
 - Secrets: `API_TOKEN` rotated and not default.
 - Monitoring: `/health` checked regularly.
-
-## Roadmap (Optional)
-
-- Alerts for price thresholds or disconnects.
-- TLS + domain automation.
-- Watch refresh optimizations.

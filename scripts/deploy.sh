@@ -22,7 +22,9 @@ if [[ ! -f .env ]]; then
   echo "Created .env from .env.example. Please edit secrets." >&2
 fi
 
-if grep -q "your_ibkr_username" .env || grep -q "your_ibkr_password" .env || grep -q "replace-with-long-random-token" .env; then
+if sed -e '/^[[:space:]]*#/d' -e 's/[[:space:]]#.*//' .env | grep -q "your_ibkr_username" || \
+   sed -e '/^[[:space:]]*#/d' -e 's/[[:space:]]#.*//' .env | grep -q "your_ibkr_password" || \
+   sed -e '/^[[:space:]]*#/d' -e 's/[[:space:]]#.*//' .env | grep -q "replace-with-long-random-token"; then
   echo "Default secrets detected in .env. Please update before deployment." >&2
   exit 1
 fi

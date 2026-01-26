@@ -14,6 +14,6 @@ fi
 xcodebuild \
   -project IBKRWatchApp.xcodeproj \
   -scheme IBKRWatchApp \
-  -destination 'platform=iOS Simulator,name=iPhone 15' \
+  -destination 'generic/platform=iOS Simulator' \
   CODE_SIGNING_ALLOWED=NO \
   build
